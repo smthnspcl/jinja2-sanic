@@ -1,4 +1,3 @@
-from sanic import Sanic
 from sanic.exceptions import ServerError
 from sanic.response import HTTPResponse
 from sanic.views import HTTPMethodView
@@ -95,8 +94,10 @@ def render_string(template_name, request, context, *, app_key=APP_KEY):
             "context should be mapping, not {}".format(type(context)),
             status_code=500,
         )
-    if request.get(REQUEST_CONTEXT_KEY):
-        context = dict(request[REQUEST_CONTEXT_KEY], **context)
+    try:
+        context = dict(request.ctx.__dict__[REQUEST_CONTEXT_KEY], **context)
+    except KeyError:
+        pass
     text = template.render(context)
     return text
 
